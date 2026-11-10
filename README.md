@@ -241,5 +241,5 @@ Os demais endpoints (produtos, pedidos, status) serão adicionados conforme o ro
 **Emerson Carlos Pereira**
 Analista e desenvolvedor de sistemas
 
-- GitHub: _adicione o link do seu perfil_
-- LinkedIn: _adicione o link do seu perfil_
+- GitHub: https://github.com/emersoncarlos-dev
+- LinkedIn: https://www.linkedin.com/in/emerson-pereira-20b859239/
