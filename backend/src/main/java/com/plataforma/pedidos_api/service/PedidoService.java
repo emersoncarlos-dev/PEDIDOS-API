@@ -1,21 +1,23 @@
 package com.plataforma.pedidos_api.service;
 
+import com.plataforma.pedidos_api.dto.AtualizarStatusRequest;
 import com.plataforma.pedidos_api.dto.ItemPedidoRequest;
 import com.plataforma.pedidos_api.dto.PedidoRequest;
 import com.plataforma.pedidos_api.entity.ItemPedido;
 import com.plataforma.pedidos_api.entity.Pedido;
 import com.plataforma.pedidos_api.entity.Produto;
+import com.plataforma.pedidos_api.entity.StatusPedido;
 import com.plataforma.pedidos_api.repository.ComercioRepository;
 import com.plataforma.pedidos_api.repository.ItemPedidoRepository;
 import com.plataforma.pedidos_api.repository.PedidoRepository;
 import com.plataforma.pedidos_api.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.UUID;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PedidoService {
@@ -85,6 +87,22 @@ public class PedidoService {
 
     @Transactional(readOnly = true)
     public List<Pedido> listarPorComercio(UUID comercioId) {
-    return pedidoRepository.findByComercioIdOrderByCriadoEmDesc(comercioId);
-}
+        return pedidoRepository.findByComercioIdOrderByCriadoEmDesc(comercioId);
+    }
+
+    @Transactional
+    public Pedido atualizarStatus(UUID pedidoId, AtualizarStatusRequest request) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado"));
+
+        StatusPedido atual = StatusPedido.deValor(pedido.getStatus());
+        if (atual.finalizado()) {
+            throw new IllegalArgumentException(
+                    "Pedido já está " + atual.getValor() + " e não pode mais ser alterado");
+        }
+
+        StatusPedido novo = StatusPedido.deValor(request.status());
+        pedido.setStatus(novo.getValor());
+        return pedidoRepository.save(pedido);
+    }
 }
