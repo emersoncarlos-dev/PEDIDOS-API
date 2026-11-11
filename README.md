@@ -212,9 +212,9 @@ Os demais endpoints (produtos, pedidos, status) serão adicionados conforme o ro
 - [x] Projeto Spring Boot criado e conectado ao banco
 - [x] Entidade `Comercio` e repository
 - [x] Endpoint `GET /comercios`
-- [ ] Entidades `Produto`, `Pedido` e `ItemPedido`
-- [ ] Endpoints do cardápio e de criação de pedidos
-- [ ] Regras de negócio e validações (produto indisponível, total do pedido)
+- [x] Entidades `Produto`, `Pedido` e `ItemPedido`
+- [x] Endpoints do cardápio e de criação de pedidos
+- [x] Regras de negócio e validações (produto indisponível, total do pedido)
 - [ ] Autenticação do dono do comércio
 - [ ] Atualização de pedidos em tempo real
 - [ ] Frontend do cliente (cardápio e carrinho)
