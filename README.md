@@ -82,7 +82,7 @@ O backend é dividido em camadas, cada uma com uma responsabilidade:
 | Build | Maven (com Maven Wrapper) |
 | Banco de dados | PostgreSQL hospedado no Supabase |
 | Frontend (planejado) | React |
-| DevOps (planejado) | Docker, Docker Compose, GitHub Actions |
+| DevOps (planejado) | Docker, Docker Compose, GitHub Actions, health check com Spring Boot Actuator |
 | Deploy (planejado) | Serviço com plano gratuito (Vercel, Render ou Railway) |
 
 ---
@@ -394,11 +394,12 @@ Conflito (`409`):
 - [ ] Testes automatizados
 - [ ] Docker e Docker Compose
 - [ ] Pipeline de CI com GitHub Actions
+- [ ] Deploy do backend em um serviço gratuito, com health check
 - [ ] Frontend do cliente (cardápio e carrinho)
 - [ ] Painel do dono (pedidos e status)
 - [ ] Autenticação do dono do comércio
 - [ ] Atualização de pedidos em tempo real
-- [ ] Deploy online
+- [ ] Deploy do frontend e integração final
 
 ---
 
@@ -406,9 +407,10 @@ Conflito (`409`):
 
 - **Docker** para empacotar o backend e o frontend
 - **Docker Compose** para subir o ambiente completo com um único comando
-- **GitHub Actions** para compilar e rodar os testes a cada push
+- **GitHub Actions** para compilar e rodar os testes a cada push (integração contínua)
+- **Deploy contínuo do backend** em um serviço com plano gratuito, a partir do GitHub
+- **Health check** com Spring Boot Actuator, para saber se a aplicação está saudável
 - **Variáveis de ambiente** para todas as credenciais, sem segredos no repositório
-- **Deploy automático** em um serviço com plano gratuito
 
 ---
 
