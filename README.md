@@ -2,7 +2,7 @@
 
 Sistema fullstack de **cardápio digital e pedidos em tempo real** para pequenos comércios (lanchonetes, padarias, hamburguerias, entre outros). O cliente abre o cardápio por um link, monta o pedido e acompanha o andamento. O dono do comércio recebe os pedidos em um painel e atualiza o status de cada um.
 
-> **Status do projeto:** em desenvolvimento. O núcleo do backend (cardápio, criação de pedidos, listagem e atualização de status) já funciona. Autenticação, tempo real, frontend e deploy estão no [roadmap](#roadmap).
+> **Status do projeto:** em desenvolvimento. O núcleo do backend (comércios, cardápio, criação de pedidos, listagem e atualização de status) já funciona. Testes automatizados, Docker, frontend, autenticação, tempo real e deploy estão no [roadmap](#roadmap).
 
 ---
 
@@ -34,7 +34,7 @@ Muitos pequenos comércios recebem pedidos por mensagem, anotam à mão e perdem
 ### Para o dono do comércio
 - Painel com os pedidos recebidos e os itens de cada um
 - Alterar o status de cada pedido
-- Cadastrar e gerenciar os produtos do cardápio
+- Cadastrar o comércio e gerenciar os produtos do cardápio
 - Marcar produtos como disponíveis ou indisponíveis
 - Login para acesso ao painel
 
@@ -98,6 +98,7 @@ As regras abaixo são aplicadas pelo backend, e não dependem do cliente:
 - **O pedido precisa ter pelo menos um item**, com quantidade maior que zero.
 - **Pedidos entregues ou cancelados não podem mais mudar de status.**
 - **Pedido e itens são gravados em uma única transação:** se algo falhar, nada é salvo pela metade.
+- **O `slug` do comércio é único** e só aceita letras minúsculas, números e hífens.
 
 ---
 
@@ -233,11 +234,26 @@ A API sobe em `http://localhost:8080`.
 | Método | Rota | Descrição |
 |---|---|---|
 | `GET` | `/comercios` | Lista os comércios cadastrados |
+| `POST` | `/comercios` | Cadastra um comércio (o `slug` precisa ser único, senão retorna 409) |
 | `GET` | `/produtos/comercio/{comercioId}` | Lista o cardápio de um comércio |
 | `POST` | `/produtos` | Cadastra um produto |
 | `POST` | `/pedidos` | Cria um pedido (valida os produtos e calcula o total no servidor) |
 | `GET` | `/pedidos/comercio/{comercioId}` | Lista os pedidos do comércio, do mais recente ao mais antigo, com os itens |
 | `PATCH` | `/pedidos/{id}/status` | Atualiza o status do pedido |
+
+### Exemplo: cadastrar um comércio
+
+`POST /comercios`
+
+```json
+{
+  "nome": "Padaria do Zé",
+  "slug": "padaria-do-ze",
+  "telefone": "81999999999"
+}
+```
+
+O `slug` é o nome do comércio na URL: só aceita letras minúsculas, números e hífens, e não pode se repetir.
 
 ### Exemplo: criar um pedido
 
@@ -320,21 +336,39 @@ Valores aceitos: `recebido`, `em_preparo`, `pronto`, `entregue` e `cancelado`.
 
 ### Respostas de erro
 
-Erros de regra de negócio e de validação voltam como `400 Bad Request` com uma mensagem clara.
+Os erros voltam em JSON, com uma mensagem clara:
 
-Regra de negócio (por exemplo, produto indisponível):
+| Código | Quando acontece |
+|---|---|
+| `400 Bad Request` | Dado inválido ou regra de negócio violada |
+| `404 Not Found` | O recurso da URL não existe (por exemplo, pedido inexistente) |
+| `409 Conflict` | O dado colide com um que já existe (por exemplo, `slug` repetido) |
+
+Regra de negócio (`400`):
 
 ```json
 { "erro": "O produto X-Burger está indisponível" }
 ```
 
-Dados inválidos:
+Dados inválidos (`400`):
 
 ```json
 {
   "erro": "Dados inválidos",
   "detalhes": ["itens[0].quantidade: deve ser maior que 0"]
 }
+```
+
+Recurso inexistente (`404`):
+
+```json
+{ "erro": "Pedido não encontrado" }
+```
+
+Conflito (`409`):
+
+```json
+{ "erro": "Já existe um comércio com o slug: padaria-do-ze" }
 ```
 
 ---
