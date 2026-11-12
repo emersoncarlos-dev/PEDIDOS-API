@@ -2,11 +2,14 @@ package com.plataforma.pedidos_api.service;
 
 import com.plataforma.pedidos_api.dto.AtualizarStatusRequest;
 import com.plataforma.pedidos_api.dto.ItemPedidoRequest;
+import com.plataforma.pedidos_api.dto.ItemPedidoResponse;
 import com.plataforma.pedidos_api.dto.PedidoRequest;
+import com.plataforma.pedidos_api.dto.PedidoResponse;
 import com.plataforma.pedidos_api.entity.ItemPedido;
 import com.plataforma.pedidos_api.entity.Pedido;
 import com.plataforma.pedidos_api.entity.Produto;
 import com.plataforma.pedidos_api.entity.StatusPedido;
+import com.plataforma.pedidos_api.exception.RecursoNaoEncontradoException;
 import com.plataforma.pedidos_api.repository.ComercioRepository;
 import com.plataforma.pedidos_api.repository.ItemPedidoRepository;
 import com.plataforma.pedidos_api.repository.PedidoRepository;
@@ -14,10 +17,13 @@ import com.plataforma.pedidos_api.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -86,14 +92,47 @@ public class PedidoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Pedido> listarPorComercio(UUID comercioId) {
-        return pedidoRepository.findByComercioIdOrderByCriadoEmDesc(comercioId);
+    public List<PedidoResponse> listarPorComercio(UUID comercioId) {
+        List<Pedido> pedidos = pedidoRepository.findByComercioIdOrderByCriadoEmDesc(comercioId);
+        if (pedidos.isEmpty()) {
+            return List.of();
+        }
+
+        List<UUID> pedidoIds = pedidos.stream().map(Pedido::getId).toList();
+        List<ItemPedido> itens = itemPedidoRepository.findByPedidoIdIn(pedidoIds);
+
+        Map<UUID, String> nomesProdutos = produtoRepository
+                .findAllById(itens.stream().map(ItemPedido::getProdutoId).distinct().toList())
+                .stream()
+                .collect(Collectors.toMap(Produto::getId, Produto::getNome));
+
+        Map<UUID, List<ItemPedido>> itensPorPedido = itens.stream()
+                .collect(Collectors.groupingBy(ItemPedido::getPedidoId));
+
+        return pedidos.stream()
+                .map(p -> new PedidoResponse(
+                        p.getId(),
+                        p.getComercioId(),
+                        p.getNomeCliente(),
+                        p.getTelefoneCliente(),
+                        p.getStatus(),
+                        p.getTotal(),
+                        p.getCriadoEm(),
+                        itensPorPedido.getOrDefault(p.getId(), List.of()).stream()
+                                .map(i -> new ItemPedidoResponse(
+                                        i.getProdutoId(),
+                                        nomesProdutos.get(i.getProdutoId()),
+                                        i.getQuantidade(),
+                                        i.getPrecoUnitario(),
+                                        i.getPrecoUnitario().multiply(BigDecimal.valueOf(i.getQuantidade()))))
+                                .toList()))
+                .toList();
     }
 
     @Transactional
     public Pedido atualizarStatus(UUID pedidoId, AtualizarStatusRequest request) {
         Pedido pedido = pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new IllegalArgumentException("Pedido não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
 
         StatusPedido atual = StatusPedido.deValor(pedido.getStatus());
         if (atual.finalizado()) {

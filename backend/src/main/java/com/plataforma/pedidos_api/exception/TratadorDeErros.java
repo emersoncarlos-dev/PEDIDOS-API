@@ -1,5 +1,6 @@
 package com.plataforma.pedidos_api.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,4 +25,10 @@ public class TratadorDeErros {
         return ResponseEntity.badRequest()
                 .body(Map.of("erro", "Dados inválidos", "detalhes", detalhes));
     }
+
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
+    public ResponseEntity<Map<String, String>> naoEncontrado(RecursoNaoEncontradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("erro", ex.getMessage()));
+    }
+
 }

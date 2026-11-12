@@ -2,6 +2,7 @@ package com.plataforma.pedidos_api.controller;
 
 import com.plataforma.pedidos_api.dto.AtualizarStatusRequest;
 import com.plataforma.pedidos_api.dto.PedidoRequest;
+import com.plataforma.pedidos_api.dto.PedidoResponse;
 import com.plataforma.pedidos_api.entity.Pedido;
 import com.plataforma.pedidos_api.service.PedidoService;
 import jakarta.validation.Valid;
@@ -35,7 +36,7 @@ public class PedidoController {
     }
 
     @GetMapping("/comercio/{comercioId}")
-    public List<Pedido> listarPorComercio(@PathVariable UUID comercioId) {
+    public List<PedidoResponse> listarPorComercio(@PathVariable UUID comercioId) {
         return pedidoService.listarPorComercio(comercioId);
     }
 
