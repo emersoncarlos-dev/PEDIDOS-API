@@ -9,4 +9,5 @@ import java.util.UUID;
 public interface ComercioRepository extends JpaRepository<Comercio, UUID> {
 
     Optional<Comercio> findBySlug(String slug);
+    boolean existsBySlug(String slug);
 }

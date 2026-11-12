@@ -346,23 +346,24 @@ Dados inválidos:
 - [x] Projeto Spring Boot criado e conectado ao banco
 - [x] Entidades `Comercio`, `Produto`, `Pedido` e `ItemPedido`, com seus repositories
 - [x] Listagem de comércios e do cardápio, e cadastro de produtos
+- [x] Cadastro de comércios, com slug único (409 em caso de duplicidade)
 - [x] Criação de pedidos com validação e cálculo de total no servidor
 - [x] Regras de negócio (produto indisponível, produto de outro comércio, transação)
 - [x] Tratamento de erros com mensagens claras
+- [x] Respostas `404 Not Found` para recursos que não existem
 - [x] Listagem de pedidos com os itens de cada um
 - [x] Atualização de status do pedido, com regra para pedidos finalizados
 
 ### Próximos passos
-- [ ] Respostas `404 Not Found` para recursos que não existem
-- [ ] Cadastro de comércios e opção de marcar produto como indisponível
 - [ ] DTOs e validação no cadastro de produtos
+- [ ] Opção de marcar produto como indisponível
 - [ ] Testes automatizados
 - [ ] Docker e Docker Compose
 - [ ] Pipeline de CI com GitHub Actions
-- [ ] Autenticação do dono do comércio
-- [ ] Atualização de pedidos em tempo real
 - [ ] Frontend do cliente (cardápio e carrinho)
 - [ ] Painel do dono (pedidos e status)
+- [ ] Autenticação do dono do comércio
+- [ ] Atualização de pedidos em tempo real
 - [ ] Deploy online
 
 ---

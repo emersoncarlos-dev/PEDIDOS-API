@@ -31,4 +31,10 @@ public class TratadorDeErros {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("erro", ex.getMessage()));
     }
 
+    @ExceptionHandler(ConflitoException.class)
+    public ResponseEntity<Map<String, String>> conflito(ConflitoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("erro", ex.getMessage()));
 }
+
+}
+
