@@ -99,6 +99,27 @@ As regras abaixo são aplicadas pelo backend, e não dependem do cliente:
 - **Pedidos entregues ou cancelados não podem mais mudar de status.**
 - **Pedido e itens são gravados em uma única transação:** se algo falhar, nada é salvo pela metade.
 - **O `slug` do comércio é único** e só aceita letras minúsculas, números e hífens.
+- **O cadastro de produto só aceita os campos permitidos** (comércio, nome, descrição e preço). `id` e disponibilidade são definidos pelo servidor.
+
+---
+
+## Segurança
+
+Medidas já aplicadas:
+
+- **Credenciais fora do repositório:** a conexão com o banco usa variáveis de ambiente.
+- **DTOs de entrada** nos endpoints de criação e de atualização: o cliente só envia os campos permitidos, e o servidor define `id`, datas, status inicial e disponibilidade. Isso evita que alguém grave campos que não deveria controlar (*mass assignment*).
+- **Validação de tamanho e formato** dos dados recebidos (Bean Validation).
+- **Tratamento centralizado de erros**, com mensagens controladas.
+- **Row Level Security** habilitado no banco, que é acessado apenas pelo backend.
+
+Planejadas:
+
+- Autenticação do dono do comércio (JWT) e autorização por comércio, **antes de qualquer deploy público**. Enquanto ela não existir, a API não deve ser publicada com dados reais.
+- DTOs de resposta nos demais endpoints (comércios e criação de pedido).
+- CORS restrito ao endereço do frontend e Actuator expondo apenas o `/health`.
+- Secret scanning e Dependabot ativados no GitHub.
+- Dados pessoais do cliente (como o telefone) visíveis apenas para o dono do comércio.
 
 ---
 
@@ -236,7 +257,7 @@ A API sobe em `http://localhost:8080`.
 | `GET` | `/comercios` | Lista os comércios cadastrados |
 | `POST` | `/comercios` | Cadastra um comércio (o `slug` precisa ser único, senão retorna 409) |
 | `GET` | `/produtos/comercio/{comercioId}` | Lista o cardápio de um comércio |
-| `POST` | `/produtos` | Cadastra um produto |
+| `POST` | `/produtos` | Cadastra um produto (valida nome, preço e se o comércio existe; o servidor define `id` e disponibilidade) |
 | `POST` | `/pedidos` | Cria um pedido (valida os produtos e calcula o total no servidor) |
 | `GET` | `/pedidos/comercio/{comercioId}` | Lista os pedidos do comércio, do mais recente ao mais antigo, com os itens |
 | `PATCH` | `/pedidos/{id}/status` | Atualiza o status do pedido |
@@ -254,6 +275,32 @@ A API sobe em `http://localhost:8080`.
 ```
 
 O `slug` é o nome do comércio na URL: só aceita letras minúsculas, números e hífens, e não pode se repetir.
+
+### Exemplo: cadastrar um produto
+
+`POST /produtos`
+
+```json
+{
+  "comercioId": "uuid-do-comercio",
+  "nome": "Café com Leite",
+  "descricao": "Média, feito na hora",
+  "preco": 6.00
+}
+```
+
+O cliente envia só esses quatro campos. O `id` e a disponibilidade (que começa como `true`) são definidos pelo servidor, e qualquer outro campo enviado é ignorado. Resposta (`201 Created`):
+
+```json
+{
+  "id": "uuid-do-produto",
+  "comercioId": "uuid-do-comercio",
+  "nome": "Café com Leite",
+  "descricao": "Média, feito na hora",
+  "preco": 6.00,
+  "disponivel": true
+}
+```
 
 ### Exemplo: criar um pedido
 
@@ -381,6 +428,7 @@ Conflito (`409`):
 - [x] Entidades `Comercio`, `Produto`, `Pedido` e `ItemPedido`, com seus repositories
 - [x] Listagem de comércios e do cardápio, e cadastro de produtos
 - [x] Cadastro de comércios, com slug único (409 em caso de duplicidade)
+- [x] Cadastro de produtos com DTO de entrada e de saída, validação e service
 - [x] Criação de pedidos com validação e cálculo de total no servidor
 - [x] Regras de negócio (produto indisponível, produto de outro comércio, transação)
 - [x] Tratamento de erros com mensagens claras
@@ -389,8 +437,8 @@ Conflito (`409`):
 - [x] Atualização de status do pedido, com regra para pedidos finalizados
 
 ### Próximos passos
-- [ ] DTOs e validação no cadastro de produtos
 - [ ] Opção de marcar produto como indisponível
+- [ ] DTOs de resposta nos demais endpoints (comércios e criação de pedido)
 - [ ] Testes automatizados
 - [ ] Docker e Docker Compose
 - [ ] Pipeline de CI com GitHub Actions

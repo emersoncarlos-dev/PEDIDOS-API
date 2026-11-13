@@ -28,7 +28,7 @@ public class Produto {
     private boolean disponivel = true;
 
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private OffsetDateTime criado_em = OffsetDateTime.now();
+    private OffsetDateTime criadoEm = OffsetDateTime.now();
 
     // Getters e Setters
     public UUID getId() { return id; }
@@ -48,7 +48,6 @@ public class Produto {
 
     public boolean isDisponivel() { return disponivel; }
     public void setDisponivel(boolean disponivel) { this.disponivel = disponivel; }
-
-    public OffsetDateTime getCriado_em() { return criado_em; }
-    public void setCriado_em(OffsetDateTime criado_em) { this.criado_em = criado_em; }
+ 
+    public OffsetDateTime getCriadoEm() { return criadoEm; }
 }
