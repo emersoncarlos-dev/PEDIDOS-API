@@ -94,7 +94,7 @@ As regras abaixo são aplicadas pelo backend, e não dependem do cliente:
 - **O total do pedido é calculado no servidor**, a partir dos preços cadastrados no banco. O cliente informa apenas os produtos e as quantidades.
 - **O preço do produto é copiado para o item do pedido** no momento da compra. Mudar o preço no cardápio depois não altera os pedidos antigos.
 - **Um pedido só aceita produtos do próprio comércio.** Produtos de outro comércio são recusados.
-- **Produtos indisponíveis não podem ser pedidos.**
+- **Produtos indisponíveis não podem ser pedidos.** O dono pode marcar um produto como indisponível (e voltar a disponível) a qualquer momento.
 - **O pedido precisa ter pelo menos um item**, com quantidade maior que zero.
 - **Pedidos entregues ou cancelados não podem mais mudar de status.**
 - **Pedido e itens são gravados em uma única transação:** se algo falhar, nada é salvo pela metade.
@@ -258,6 +258,7 @@ A API sobe em `http://localhost:8080`.
 | `POST` | `/comercios` | Cadastra um comércio (o `slug` precisa ser único, senão retorna 409) |
 | `GET` | `/produtos/comercio/{comercioId}` | Lista o cardápio de um comércio |
 | `POST` | `/produtos` | Cadastra um produto (valida nome, preço e se o comércio existe; o servidor define `id` e disponibilidade) |
+| `PATCH` | `/produtos/{id}/disponibilidade` | Marca um produto como disponível ou indisponível (404 se não existir) |
 | `POST` | `/pedidos` | Cria um pedido (valida os produtos e calcula o total no servidor) |
 | `GET` | `/pedidos/comercio/{comercioId}` | Lista os pedidos do comércio, do mais recente ao mais antigo, com os itens |
 | `PATCH` | `/pedidos/{id}/status` | Atualiza o status do pedido |
@@ -301,6 +302,16 @@ O cliente envia só esses quatro campos. O `id` e a disponibilidade (que começa
   "disponivel": true
 }
 ```
+
+### Exemplo: marcar um produto como indisponível
+
+`PATCH /produtos/{id}/disponibilidade`
+
+```json
+{ "disponivel": false }
+```
+
+Resposta (`200 OK`): o produto atualizado, com `"disponivel": false`. Enquanto estiver indisponível, qualquer pedido que inclua esse produto é recusado. Se o produto não existir, a resposta é `404`. Se o campo `disponivel` não for enviado, a resposta é `400`.
 
 ### Exemplo: criar um pedido
 
@@ -388,7 +399,7 @@ Os erros voltam em JSON, com uma mensagem clara:
 | Código | Quando acontece |
 |---|---|
 | `400 Bad Request` | Dado inválido ou regra de negócio violada |
-| `404 Not Found` | O recurso da URL não existe (por exemplo, pedido inexistente) |
+| `404 Not Found` | O recurso da URL não existe (por exemplo, pedido ou produto inexistente) |
 | `409 Conflict` | O dado colide com um que já existe (por exemplo, `slug` repetido) |
 
 Regra de negócio (`400`):
@@ -429,6 +440,7 @@ Conflito (`409`):
 - [x] Listagem de comércios e do cardápio, e cadastro de produtos
 - [x] Cadastro de comércios, com slug único (409 em caso de duplicidade)
 - [x] Cadastro de produtos com DTO de entrada e de saída, validação e service
+- [x] Opção de marcar produto como indisponível
 - [x] Criação de pedidos com validação e cálculo de total no servidor
 - [x] Regras de negócio (produto indisponível, produto de outro comércio, transação)
 - [x] Tratamento de erros com mensagens claras
@@ -437,7 +449,6 @@ Conflito (`409`):
 - [x] Atualização de status do pedido, com regra para pedidos finalizados
 
 ### Próximos passos
-- [ ] Opção de marcar produto como indisponível
 - [ ] DTOs de resposta nos demais endpoints (comércios e criação de pedido)
 - [ ] Testes automatizados
 - [ ] Docker e Docker Compose

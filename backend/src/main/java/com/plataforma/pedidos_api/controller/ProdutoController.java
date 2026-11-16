@@ -1,5 +1,6 @@
 package com.plataforma.pedidos_api.controller;
 
+import com.plataforma.pedidos_api.dto.AtualizarDisponibilidadeRequest;
 import com.plataforma.pedidos_api.dto.ProdutoRequest;
 import com.plataforma.pedidos_api.dto.ProdutoResponse;
 import com.plataforma.pedidos_api.service.ProdutoService;
@@ -7,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +31,13 @@ public class ProdutoController {
     @GetMapping("/comercio/{comercioId}")
     public List<ProdutoResponse> listarPorComercio(@PathVariable UUID comercioId) {
         return produtoService.listarPorComercio(comercioId);
+    }
+
+    @PatchMapping("/{id}/disponibilidade")
+    public ProdutoResponse atualizarDisponibilidade(
+            @PathVariable UUID id,
+            @Valid @RequestBody AtualizarDisponibilidadeRequest request) {
+        return produtoService.atualizarDisponibilidade(id, request);
     }
 
     @PostMapping

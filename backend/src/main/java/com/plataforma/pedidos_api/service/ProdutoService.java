@@ -1,8 +1,10 @@
 package com.plataforma.pedidos_api.service;
 
+import com.plataforma.pedidos_api.dto.AtualizarDisponibilidadeRequest;
 import com.plataforma.pedidos_api.dto.ProdutoRequest;
 import com.plataforma.pedidos_api.dto.ProdutoResponse;
 import com.plataforma.pedidos_api.entity.Produto;
+import com.plataforma.pedidos_api.exception.RecursoNaoEncontradoException;
 import com.plataforma.pedidos_api.repository.ComercioRepository;
 import com.plataforma.pedidos_api.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,16 @@ public class ProdutoService {
         produto.setDescricao(request.descricao());
         produto.setPreco(request.preco());
 
+        return ProdutoResponse.de(produtoRepository.save(produto));
+    }
+
+    @Transactional
+    public ProdutoResponse atualizarDisponibilidade(UUID produtoId,
+                                                    AtualizarDisponibilidadeRequest request) {
+        Produto produto = produtoRepository.findById(produtoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado"));
+
+        produto.setDisponivel(request.disponivel());
         return ProdutoResponse.de(produtoRepository.save(produto));
     }
 
