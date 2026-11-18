@@ -37,3 +37,17 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 .DS_Store
+
+# Segredos e configurações locais (nunca versionar)
+.env
+.env.*
+*.env
+!.env.example
+application-local.properties
+application-secret*.properties
+*.pem
+*.key
+
+# Logs
+*.log
+logs/
