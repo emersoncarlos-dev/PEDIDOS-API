@@ -447,10 +447,11 @@ Conflito (`409`):
 - [x] Respostas `404 Not Found` para recursos que não existem
 - [x] Listagem de pedidos com os itens de cada um
 - [x] Atualização de status do pedido, com regra para pedidos finalizados
+- [x] Testes unitários das regras do `PedidoService` (JUnit e Mockito)
 
 ### Próximos passos
 - [ ] DTOs de resposta nos demais endpoints (comércios e criação de pedido)
-- [ ] Testes automatizados
+- [ ] Testes de integração e dos demais services
 - [ ] Docker e Docker Compose
 - [ ] Pipeline de CI com GitHub Actions
 - [ ] Deploy do backend em um serviço gratuito, com health check
