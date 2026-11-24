@@ -112,6 +112,7 @@ Medidas já aplicadas:
 - **Validação de tamanho e formato** dos dados recebidos (Bean Validation).
 - **Tratamento centralizado de erros**, com mensagens controladas.
 - **Row Level Security** habilitado no banco, que é acessado apenas pelo backend.
+- **`.gitignore`** bloqueando arquivos de segredos (`.env`, chaves) e logs.
 
 Planejadas:
 
@@ -441,13 +442,13 @@ Conflito (`409`):
 - [x] Cadastro de comércios, com slug único (409 em caso de duplicidade)
 - [x] Cadastro de produtos com DTO de entrada e de saída, validação e service
 - [x] Opção de marcar produto como indisponível
+- [x] Testes unitários das regras do `PedidoService` (JUnit e Mockito)
 - [x] Criação de pedidos com validação e cálculo de total no servidor
 - [x] Regras de negócio (produto indisponível, produto de outro comércio, transação)
 - [x] Tratamento de erros com mensagens claras
 - [x] Respostas `404 Not Found` para recursos que não existem
 - [x] Listagem de pedidos com os itens de cada um
 - [x] Atualização de status do pedido, com regra para pedidos finalizados
-- [x] Testes unitários das regras do `PedidoService` (JUnit e Mockito)
 
 ### Próximos passos
 - [ ] DTOs de resposta nos demais endpoints (comércios e criação de pedido)
@@ -460,6 +461,18 @@ Conflito (`409`):
 - [ ] Autenticação do dono do comércio
 - [ ] Atualização de pedidos em tempo real
 - [ ] Deploy do frontend e integração final
+
+---
+
+## Testes
+
+```bash
+cd backend
+./mvnw test
+```
+
+- Os **testes unitários** (JUnit e Mockito) rodam sem banco e cobrem o cálculo do total do pedido e as regras de recusa: produto indisponível, produto de outro comércio, comércio inexistente e pedido já finalizado.
+- O **teste de integração** (`contextLoads`) sobe a aplicação inteira e só roda quando a variável `DB_URL` está definida. Sem banco configurado, ele é ignorado.
 
 ---
 
